@@ -12,19 +12,20 @@ class SimuladorController extends Controller
     public function simular(Request $request)
     {
         $this->carregarArquivoDadosSimulador()
-             ->simularEmprestimo($request->valor_emprestimo)
-             ->filtrarInstituicao($request->instituicoes)
-        ;
+            ->simularEmprestimo($request->valor_emprestimo)
+            ->filtrarInstituicao($request->instituicoes);
+            //->filtrarConvenio($request->convenios)
+            //->filtrarParcelas($request->parcelas)
         return \response()->json($this->simulacao);
     }
 
-    private function carregarArquivoDadosSimulador() : self
+    private function carregarArquivoDadosSimulador(): self
     {
         $this->dadosSimulador = json_decode(\File::get(storage_path("app/public/simulador/taxas_instituicoes.json")));
         return $this;
     }
 
-    private function simularEmprestimo(float $valorEmprestimo) : self
+    private function simularEmprestimo(float $valorEmprestimo): self
     {
         foreach ($this->dadosSimulador as $dados) {
             $this->simulacao[$dados->instituicao][] = [
@@ -37,21 +38,55 @@ class SimuladorController extends Controller
         return $this;
     }
 
-    private function calcularValorDaParcela(float $valorEmprestimo, float $coeficiente) : float
+    private function calcularValorDaParcela(float $valorEmprestimo, float $coeficiente): float
     {
         return round($valorEmprestimo * $coeficiente, 2);
     }
 
-    private function filtrarInstituicao(array $instituicoes) : self
+
+// // // // // // // ESTOU DEIXANDO AS FUNCOES FILTRARCONVENIO E FILTRARPARCELAS COMENTADAS
+// // // // // // // POIS NAO CONSEGUI TERMINA-LAS EM TEMPO HÁBIL :C
+
+
+    // private function filtrarConvenio(array $convenios): self
+    // {
+       
+    //     $arrayAux = [];
+    //     foreach ($convenios as $key => $convenio) {
+    //         if (\array_key_exists($convenio, $this->simulacao)) {
+    //                 $arrayAux[$convenio] = $this->simulacao[$convenio];
+    //             }
+    //         $this->simulacao = $arrayAux;
+    //         }
+        
+    //     return $this;
+    // }
+
+
+    // private function filtrarParcelas(array $parcelas): self
+    // {
+       
+    //     $arrayAux = [];
+    //     foreach ($parcelas as $key => $parcela) {
+    //         if (\array_key_exists($parcela, $this->simulacao)) {
+    //                 $arrayAux[$parcela] = $this->simulacao[$parcela];
+    //             }
+    //         $this->simulacao = $arrayAux;
+    //         }
+        
+    //     return $this;
+    // }
+
+
+    private function filtrarInstituicao(array $instituicoes): self
     {
-        if (\count($instituicoes))
-        {
+        if (\count($instituicoes)) {
             $arrayAux = [];
-            foreach ($instituicoes AS $key => $instituicao)
-            {
-                if (\array_key_exists($instituicao, $this->simulacao))
-                {
-                     $arrayAux[$instituicao] = $this->simulacao[$instituicao];
+            foreach ($instituicoes as $key => $instituicao) {
+                // print_r($instituicao);
+                if (\array_key_exists($instituicao, $this->simulacao)) {
+
+                    $arrayAux[$instituicao] = $this->simulacao[$instituicao];
                 }
             }
             $this->simulacao = $arrayAux;
